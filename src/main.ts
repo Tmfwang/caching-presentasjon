@@ -119,25 +119,15 @@ function flow(
   if (mode === "plain" && step > 0) {
     const count = step === 1 ? 1 : step === 2 ? 4 : 7;
     for (let i = 0; i < count; i++) {
-      const y = 250 + i * 6;
-      body += packet(`M260 ${y}H500 M660 ${y}H1090`, "cyan", i * 0.13, 1.3);
-      body += packet(
-        `M1110 ${y + 30}H660 M500 ${y + 30}H280`,
-        "green",
-        1.4 + i * 0.13,
-        1,
-        true,
-      );
+      body += packet("M260 250H1110", "cyan", i * 0.13, 1.3);
+      body += packet("M1110 290H260", "green", 1.4 + i * 0.13, 1, true);
     }
     if (step === 3)
       body += `<g class="reveal">${text(1000, 120, "Samme dokumentliste. Igjen og igjen.", "small")}${[0, 1, 2, 3].map((i) => doc(1020 + i * 23, 170, "v1", 0.35)).join("")}</g>`;
   }
   if (mode === "cache") {
     if (step === 1) body += packet("M260 250H1110", "cyan");
-    if (step === 2)
-      body +=
-        packet(back, "green", 0, 1.1, true) +
-        packet(answer, "green", 0.8, 0.7, true);
+    if (step === 2) body += packet("M1110 290H260", "green", 0, 1.8, true);
     if (step >= 3)
       for (let i = 0; i < 4; i++)
         body +=
@@ -317,26 +307,61 @@ function singleFlight(step: number): string {
 function pods(step: number): string {
   const redis = step >= 4;
   const restart = step === 3 || step === 6;
-  const podToSource = "M345 135V80Q345 55 370 55H1255Q1280 55 1280 80V175";
-  const sourceToPod = "M1280 175V80Q1280 55 1255 55H370Q345 55 345 80V135";
-  const podToRedis = "M425 290C490 390 1010 390 1020 285";
+  const podToSource =
+    "M425 175H435Q455 175 455 155V75Q455 55 475 55H1260Q1280 55 1280 75V175";
+  const sourceToPod =
+    "M1280 175V75Q1280 55 1260 55H475Q455 55 455 75V155Q455 175 435 175H425";
+  const lineSpacing = 3;
+  const userToPod = (index: number) => {
+    const x = 345 + index * 220;
+    const start = 253 - index * lineSpacing;
+    const turn = 225 - index * lineSpacing;
+    const lane = 115 - index * lineSpacing;
+    return `M115 ${start}H${turn - 20}Q${turn} ${start} ${turn} ${start - 20}V${lane + 20}Q${turn} ${lane} ${turn + 20} ${lane}H${x - 20}Q${x} ${lane} ${x} ${lane + 20}V135`;
+  };
+  const redisRoute = (index: number) => {
+    const x = 345 + index * 220;
+    const lane = 422 - index * lineSpacing;
+    const turn = 935 - index * lineSpacing;
+    const entry = 242 - index * lineSpacing;
+    return {
+      forward: `M${x} 355V${lane - 20}Q${x} ${lane} ${x + 20} ${lane}H${turn - 20}Q${turn} ${lane} ${turn} ${lane - 20}V${entry + 20}Q${turn} ${entry} ${turn + 20} ${entry}H955`,
+      backward: `M955 ${entry}H${turn + 20}Q${turn} ${entry} ${turn} ${entry + 20}V${lane - 20}Q${turn} ${lane} ${turn - 20} ${lane}H${x + 20}Q${x} ${lane} ${x} ${lane - 20}V355`,
+    };
+  };
+  const localSourceRoute = (index: number) => {
+    const x = 345 + index * 220;
+    const lane = 422 - index * lineSpacing;
+    const entry = 1292 - index * lineSpacing;
+    return `M${x} 355V${lane - 20}Q${x} ${lane} ${x + 20} ${lane}H${entry - 20}Q${entry} ${lane} ${entry} ${lane - 20}V315`;
+  };
+  const podToRedis = redisRoute(0).forward;
   const loading = step === 5 || step === 7;
   const loadDelay = step === 7 ? 0.9 : 0.2;
   let body = `<rect x="210" y="65" width="720" height="390" rx="30" fill="#101b2a55" stroke="#35445e" stroke-dasharray="7 7"/>${text(570, 100, "OPENSHIFT", "micro")}`;
-  if (redis) body += wire(podToSource, "active");
-  body += icon(90, 250, "user", "#63d9f3") + text(90, 315, "Bruker", "small");
+  for (let i = 0; i < 3; i++) {
+    body +=
+      wire(userToPod(i), "active") +
+      wire(
+        redis ? redisRoute(i).forward : localSourceRoute(i),
+        redis ? "purple" : "",
+      );
+  }
+  if (redis)
+    body +=
+      `<path d="${podToSource}" fill="none" stroke="#090d17" stroke-width="8"/>` +
+      wire(podToSource, "active");
+  body += icon(90, 250, "user", "#63d9f3") + text(90, 315, "Brukere", "small");
   body += node(1280, 245, "source", "Datakilde", "purple");
   for (let i = 0; i < 3; i++) {
     const x = 345 + i * 220;
-    body += wire(`M115 250C175 250 175 115 ${x} 115V135`, "active");
     body += `<g class="${restart && i === 0 ? "restart-pod" : ""}"><rect x="${x - 80}" y="135" width="160" height="220" rx="17" class="panel cyan"/>${icon(x, 178, "service")}${text(x, 225, `Pod ${String.fromCharCode(65 + i)}`, "label")}`;
     if (!redis) {
       const hasData =
         (step >= 1 && i === 0 && !restart) || (step >= 2 && i === 1);
       body += `<rect x="${x - 57}" y="245" width="114" height="86" rx="10" class="panel green"/>${text(x, 273, "Lokal cache", "small")}`;
       body += hasData ? doc(x, 301, "v1", 0.32) : text(x, 307, "Tom", "small");
-      const path = `M${x + 80} 300C${x + 140} 470 1140 470 1200 280`;
-      body += wire(path);
+      const path = localSourceRoute(i);
       if (
         (step === 1 && i === 0) ||
         (step === 2 && i === 1) ||
@@ -346,17 +371,16 @@ function pods(step: number): string {
     }
     body += "</g>";
     if (redis) {
-      const path = `M${x + 80} 290C${x + 145} 390 1010 390 1020 285`;
-      body += wire(path, "purple");
+      const path = redisRoute(i);
       if ((loading && i > 0) || (step === 6 && i === 0))
         body += packet(
-          `M1020 285C1010 390 ${x + 145} 390 ${x + 80} 290`,
+          path.backward,
           "green",
           step === 6 ? 0 : loadDelay + 2.7 + i * 0.16,
           0.9,
           true,
         );
-      if (step === 7) body += packet(path, "cyan", i * 0.08, 0.6);
+      if (step === 7) body += packet(path.forward, "cyan", i * 0.08, 0.6);
     }
   }
   if (redis) {
@@ -371,7 +395,7 @@ function pods(step: number): string {
     if (step === 6) body += doc(1035, 230, "v1", 0.55);
     if (loading)
       body += `<g class="reveal" style="animation-delay:${(loadDelay + 2.6) * flowSlowDown}s">${doc(1035, 230, "v1", 0.55)}</g>`;
-    if (step === 7) body += text(1035, 165, "Ny nøkkel", "small");
+    if (step === 7) body += text(1035, 145, "Ny nøkkel", "small");
     if (loading)
       body +=
         packet(podToSource, "cyan", loadDelay, 0.8) +
@@ -386,7 +410,7 @@ function pods(step: number): string {
       );
   }
   if (restart)
-    body += text(345, 400, "Pod A starter på nytt", "small red-text");
+    body += text(345, 480, "Pod A starter på nytt", "small red-text");
   return (
     `<div class="mode-pill">${redis ? "Redis · delt" : "Caffeine · lokalt"}</div>` +
     svg(
@@ -405,7 +429,7 @@ function architecture(step: number): string {
     const y = 65 + i * 80;
     const active =
       step >= 3 ||
-      (step === 1 && i === 3) ||
+      (step === 1 && i === 4) ||
       (step === 2 && (i === 1 || i === 2 || i === 3));
     if (i < names.length - 1) body += wire(`M565 ${y + 30}v20`, "active");
     body += `<rect x="365" y="${y - 30}" width="400" height="60" rx="14" class="panel ${active ? "green" : ""}"/>${text(565, y + 8, name)}`;
@@ -610,11 +634,11 @@ const slides: Slide[] = [
     duration: 30,
     labels: [
       "Ikke et nytt arkitekturlag. Et verktøy i lagene dine.",
-      "Cache domenemodeller som returneres fra Access.",
+      "Cache rådata fra eksterne tjenester i Resource.",
       "Eller gjenbruk domenedata og beregnede resultater.",
       "Tilgjengelig fra alle arkitekturlag.",
     ],
-    note: "Vis alle fem lagene: Application, Manager, Engine, Access og Resource. Access returnerer domenemodeller og fremheves derfor sammen med Manager og Engine på steget om domenemodeller. Resource håndterer rådata og klienter. Fremhev at dette også fungerer i domenelaget. Kotlin-dataklassene trenger ikke cacheannotasjoner eller teknologiavhengigheter. Løsningen håndterer serialisering. Figuren viser mulige plasseringer, ikke at samme data skal caches i alle lag. Laget kan opprette sin egen instans.",
+    note: "Vis alle fem lagene: Application, Manager, Engine, Access og Resource. Første eksempel fremhever Resource for caching av rådata fra eksterne tjenester. Resource håndterer rådata og klienter. Access returnerer domenemodeller og fremheves derfor sammen med Manager og Engine på neste steg, som handler om domenemodeller. Fremhev at dette også fungerer i domenelaget. Kotlin-dataklassene trenger ikke cacheannotasjoner eller teknologiavhengigheter. Løsningen håndterer serialisering. Figuren viser mulige plasseringer, ikke at samme data skal caches i alle lag. Laget kan opprette sin egen instans.",
     draw: architecture,
   },
   {
@@ -724,8 +748,6 @@ function render(): void {
     slide.accent,
     `<em>${slide.accent}</em>`,
   );
-  element("eyebrow").textContent =
-    `Felles cacheløsning / ${String(current + 1).padStart(2, "0")}`;
   element("chapter").textContent = slide.chapter;
   scene.innerHTML = slide.draw(step);
   startFlowLoops();

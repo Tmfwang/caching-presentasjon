@@ -201,7 +201,7 @@ Tidene er veiledende og summerer til 10 minutter. Presentatøren styrer fremdrif
 
 **Mål:** Gjøre forskjellen mellom Caffeine og Redis konkret i et miljø med flere podder.
 
-**Tegning:** En tydelig ramme merket «OpenShift» inneholder tre podder av samme tjeneste. En bruker sender forespørsler etter listen over domstoler, som kan håndteres av ulike podder. Datakilden vises utenfor tjenesten. Redis tegnes som et separat, delt lager utenfor applikasjonspoddene.
+**Tegning:** En tydelig ramme merket «OpenShift» inneholder tre podder av samme tjeneste. Brukere sender forespørsler etter listen over domstoler, som kan håndteres av ulike podder. Datakilden vises utenfor tjenesten. Redis tegnes som et separat, delt lager utenfor applikasjonspoddene.
 
 **Animasjonssteg — Caffeine:**
 
@@ -225,7 +225,7 @@ Tidene er veiledende og summerer til 10 minutter. Presentatøren styrer fremdrif
 
 **Animasjonssteg:**
 
-1. Fremhev Access som et kjent sted å cache domenemodeller hentet fra eksterne data.
+1. Fremhev Resource som et kjent sted å cache rådata fra eksterne tjenester.
 2. Fremhev Manager, Engine og Access grønt, med en gjenkjennelig domenegjenstand eller et beregnet resultat. Access returnerer domenemodeller; Resource håndterer rådata og klienter.
 3. Marker at løsningen kan brukes fra alle lagene.
 
