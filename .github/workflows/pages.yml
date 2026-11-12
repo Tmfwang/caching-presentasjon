@@ -1,0 +1,48 @@
+name: Publiser presentasjonen
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Bygg og publiser
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Hent kildekoden
+        uses: actions/checkout@v6
+      - name: Sett opp pnpm
+        uses: pnpm/action-setup@v4
+      - name: Sett opp Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Installer avhengigheter
+        run: pnpm install --frozen-lockfile
+      - name: Kontroller typer og formatering
+        run: pnpm check && pnpm format:check
+      - name: Bygg presentasjonen
+        run: pnpm build
+      - name: Klargjør GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Last opp nettsiden
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Publiser nettsiden
+        id: deployment
+        uses: actions/deploy-pages@v4

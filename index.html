@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090d17" />
+    <title>Mindre venting. Mer flyt. — Felles caching</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./dist/main.js"></script>
+  </head>
+  <body>
+    <main id="deck" aria-label="Presentasjon av felles cacheløsning">
+      <header class="masthead">
+        <span class="brand"><i></i> FELLES CACHING</span
+        ><span id="chapter"></span>
+      </header>
+      <section id="slide" aria-labelledby="title">
+        <div class="heading">
+          <p id="eyebrow"></p>
+          <h1 id="title"></h1>
+        </div>
+        <div id="scene"></div>
+        <div class="caption">
+          <span id="step-label"></span>
+          <div id="steps" aria-label="Animasjonssteg"></div>
+        </div>
+      </section>
+      <footer>
+        <div class="tools">
+          <button
+            id="overview"
+            title="Slideoversikt (O)"
+            aria-label="Åpne slideoversikt"
+          >
+            ▦
+          </button>
+          <button
+            id="restart"
+            title="Start sliden på nytt (R)"
+            aria-label="Start sliden på nytt"
+          >
+            ↻
+          </button>
+          <button
+            id="notes"
+            title="Presentatørnotater (N)"
+            aria-label="Åpne presentatørnotater"
+          >
+            N
+          </button>
+          <button
+            id="fullscreen"
+            title="Fullskjerm (F)"
+            aria-label="Slå fullskjerm av eller på"
+          >
+            ⛶
+          </button>
+        </div>
+        <span class="hint">Piltaster eller klikk for å fortsette</span>
+        <nav aria-label="Presentasjonsnavigasjon">
+          <button id="previous" aria-label="Forrige steg">←</button
+          ><span id="counter"></span
+          ><button id="next" aria-label="Neste steg">→</button>
+        </nav>
+      </footer>
+      <div class="progress" aria-hidden="true"><div id="progress"></div></div>
+    </main>
+    <dialog id="dialog" aria-labelledby="dialog-title">
+      <div class="dialog-head">
+        <h2 id="dialog-title"></h2>
+        <button id="close-dialog" aria-label="Lukk">×</button>
+      </div>
+      <div id="dialog-body"></div>
+    </dialog>
+    <div
+      id="announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></div>
+  </body>
+</html>
