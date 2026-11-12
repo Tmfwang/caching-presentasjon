@@ -32,6 +32,8 @@ GitHub Actions bygger og publiserer automatisk ved push til `main`. I repositori
 
 `pnpm build` lager mappen `site/` med bare HTML, CSS og ferdigkompilert JavaScript. Den kan også publiseres på andre statiske webservere. Relative ressurslenker gjør at presentasjonen fungerer under `/caching-presentasjon/`, inkludert direktelenker som `#7/4`.
 
+Publiserte CSS- og JavaScript-filer får en innholdshash i filnavnet, slik at nettleseren henter nye filer når innholdet endres. HTML-en peker på de tilhørende versjonene for å unngå at gammel JavaScript kjøres mot oppdatert HTML.
+
 ## Navigasjon
 
 | Handling                                         | Tast / kontroll                                 |
