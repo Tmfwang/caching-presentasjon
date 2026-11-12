@@ -65,7 +65,7 @@ Tidene er veiledende og summerer til 10 minutter. Presentatøren styrer fremdrif
 | 7   | Mange spør. Én henter.            | 55 sek |
 | 8   | Lokalt eller delt i OpenShift.    | 65 sek |
 | 9   | Cache der du trenger den.         | 30 sek |
-| 10  | Beskyttelse følger med.           | 25 sek |
+| 10  | Sikkerhet følger med.             | 25 sek |
 | 11  | Innsikt følger med.               | 25 sek |
 | 12  | Klar til bruk.                    | 35 sek |
 
@@ -235,7 +235,7 @@ Tidene er veiledende og summerer til 10 minutter. Presentatøren styrer fremdrif
 
 **Faglig krav:** Figuren viser mulige brukssteder, ikke en anbefaling om å cache samme data i alle lag samtidig. Den skal ikke vise én global, delt instans som et arkitekturkrav.
 
-### Slide 10 — Beskyttelse følger med.
+### Slide 10 — Sikkerhet følger med.
 
 **Mål:** Gi et svært overfladisk, visuelt inntrykk av automatisk hashing og kryptering.
 

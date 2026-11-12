@@ -220,6 +220,8 @@ function freshness(step: number): string {
 
 function fingerprint(step: number): string {
   const changed = step >= 4;
+  const fingerprintPath = "M1020 195C800 70 650 70 420 195";
+  const payloadPath = "M1020 295C800 440 650 440 420 295";
   let body =
     node(340, 245, "", "Cache", "green") +
     node(1100, 245, "", "Datakilde", "purple");
@@ -227,11 +229,11 @@ function fingerprint(step: number): string {
     doc(340, 242, changed ? "v2" : "v1", 0.75) +
     doc(1100, 242, changed ? "v2" : "v1", 0.75);
   body +=
-    wire("M420 195C650 70 800 70 1020 195", "purple") +
-    wire("M1020 295C800 440 650 440 420 295", changed ? "return" : "");
+    wire(fingerprintPath, "purple") +
+    wire(payloadPath, changed ? "return" : "");
   if (step > 0)
     body +=
-      packet("M1020 185C830 85 650 85 460 185", "purple", 0, 1.2) +
+      packet(fingerprintPath, "purple", 0, 1.2) +
       text(720, 92, "Sist oppdatert", "small purple-text");
   if (step >= 2) {
     body += `<g class="reveal"><rect x="500" y="190" width="440" height="100" rx="18" class="panel ${changed ? "purple" : "green"}"/>${text(720, 235, changed ? "10:32 ≠ 10:47" : "10:32 = 10:32", "large")}${text(720, 270, changed ? "Endret" : "Uendret", "small")}</g>`;
@@ -248,7 +250,7 @@ function fingerprint(step: number): string {
       packet("M250 410H430", "green", 0, 1);
   if (step === 4)
     body +=
-      packet("M1020 295C800 440 650 440 420 295", "green", 0.5, 1.5, true) +
+      packet(payloadPath, "green", 0.5, 1.5, true) +
       text(720, 445, "Hent ny dokumentliste", "small green-text");
   if (step === 5)
     body += `<g class="reveal">${wire("M510 405H930", "purple")}<path d="M720 390v30" stroke="#b49aff" stroke-width="3"/>${text(720, 455, "Valgfri grense: vent på kontroll", "small purple-text")}</g>`;
@@ -642,7 +644,7 @@ const slides: Slide[] = [
     draw: architecture,
   },
   {
-    title: "Beskyttelse følger med.",
+    title: "Sikkerhet følger med.",
     accent: "følger med.",
     chapter: "04 / FERDIG HÅNDTERT",
     duration: 25,
