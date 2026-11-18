@@ -94,6 +94,20 @@ function flow(
     wire(right, outage ? "broken" : "active") +
     wire(back, outage ? "broken" : "return") +
     wire(answer, "return");
+
+  // Draw through-traffic first so it disappears behind the service box.
+  if (mode === "plain" && step > 0) {
+    const count = step === 1 ? 1 : step === 2 ? 4 : 7;
+    for (let i = 0; i < count; i++) {
+      body += packet("M260 250H1110", "cyan", i * 0.13, 1.3);
+      body += packet("M1110 290H260", "green", 1.4 + i * 0.13, 1, true);
+    }
+  }
+  if (mode === "cache") {
+    if (step === 1) body += packet("M260 250H1110", "cyan");
+    if (step === 2) body += packet("M1110 290H260", "green", 0, 1.8, true);
+  }
+
   body +=
     node(180, 270, "user", "Brukere") +
     node(
@@ -116,18 +130,9 @@ function flow(
     if (refresh && step === 4)
       body += `<g class="reveal" style="animation-delay:${1.5 * flowSlowDown}s">${doc(580, 265, "v2", 0.65)}</g>`;
   }
-  if (mode === "plain" && step > 0) {
-    const count = step === 1 ? 1 : step === 2 ? 4 : 7;
-    for (let i = 0; i < count; i++) {
-      body += packet("M260 250H1110", "cyan", i * 0.13, 1.3);
-      body += packet("M1110 290H260", "green", 1.4 + i * 0.13, 1, true);
-    }
-    if (step === 3)
-      body += `<g class="reveal">${text(1000, 120, "Samme dokumentliste. Igjen og igjen.", "small")}${[0, 1, 2, 3].map((i) => doc(1020 + i * 23, 170, "v1", 0.35)).join("")}</g>`;
-  }
+  if (mode === "plain" && step === 3)
+    body += `<g class="reveal">${text(1000, 120, "Samme dokumentliste. Igjen og igjen.", "small")}${[0, 1, 2, 3].map((i) => doc(1020 + i * 23, 170, "v1", 0.35)).join("")}</g>`;
   if (mode === "cache") {
-    if (step === 1) body += packet("M260 250H1110", "cyan");
-    if (step === 2) body += packet("M1110 290H260", "green", 0, 1.8, true);
     if (step >= 3)
       for (let i = 0; i < 4; i++)
         body +=
