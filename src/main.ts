@@ -343,7 +343,8 @@ function pods(step: number): string {
   const podToRedis = redisRoute(0).forward;
   const loading = step === 5 || step === 7;
   const loadDelay = step === 7 ? 0.9 : 0.2;
-  let body = `<rect x="210" y="65" width="720" height="390" rx="30" fill="#101b2a55" stroke="#35445e" stroke-dasharray="7 7"/>${text(570, 100, "OPENSHIFT", "micro")}`;
+  const openshiftWidth = redis ? 930 : 720;
+  let body = `<rect x="210" y="65" width="${openshiftWidth}" height="390" rx="30" fill="#101b2a55" stroke="#35445e" stroke-dasharray="7 7"/>${text(210 + openshiftWidth / 2, 100, "OPENSHIFT", "micro")}`;
   for (let i = 0; i < 3; i++) {
     body +=
       wire(userToPod(i), "active") +
@@ -421,7 +422,7 @@ function pods(step: number): string {
     svg(
       body,
       redis
-        ? "Tre podder deler domstollisten i Redis. Pod A henter fra datakilden og skriver til Redis; Redis kaller ikke datakilden. Cacheverdien overlever omstart av Pod A. Lasting kan samordnes mellom podder."
+        ? "Tre applikasjonspodder deler domstollisten i en Redis-cache i OpenShift. Pod A henter fra datakilden og skriver til Redis; Redis kaller ikke datakilden. Cacheverdien overlever omstart av Pod A. Lasting kan samordnes mellom podder."
         : "Tre podder har hver sin lokale domstolliste i Caffeine. Ved omstart mister Pod A sin lokale cache.",
     )
   );
@@ -509,7 +510,7 @@ function telemetry(step: number): string {
 }
 
 function codeScene(step: number): string {
-  return `<div class="code-card" data-no-advance><div class="code-top"><i></i><i></i><i></i><span>Kotlin · i din tjeneste</span></div><pre><code><span class="code-line"><span class="kw">val</span> dokumentliste: List&lt;Dokument&gt; = caching.<span class="fn">getOrRefresh</span>(</span><span class="code-line ${step === 1 ? "highlight" : ""}">    key = <span class="str">"dokumentliste:$sakId"</span>,</span><span class="code-line">    operationName = <span class="str">"hentDokumentliste"</span>,</span><span class="code-line">) {</span><span class="code-line ${step === 2 ? "highlight" : ""}">    dokumentAccess.<span class="fn">hentDokumentliste</span>(sakId)</span><span class="code-line">}</span></code></pre></div>${step === 3 ? '<div class="demo-call">La oss prøve. ↗</div>' : ""}`;
+  return `<div class="code-card" data-no-advance><div class="code-top"><i></i><i></i><i></i><span>Kotlin · i din tjeneste</span></div><pre><code><span class="code-line"><span class="kw">val</span> dokumentliste: List&lt;Dokument&gt; = caching.<span class="fn">getOrRefresh</span>(</span><span class="code-line ${step === 1 ? "highlight" : ""}">    key = <span class="str">"dokumentliste:$sakId"</span>,</span><span class="code-line">    operationName = <span class="str">"hentDokumentliste"</span>,</span><span class="code-line ${step === 2 ? "highlight" : ""}">    refreshAfter = 5.minutes,</span><span class="code-line">) {</span><span class="code-line ${step === 3 ? "highlight" : ""}">    dokumentAccess.<span class="fn">hentDokumentliste</span>(sakId)</span><span class="code-line">}</span></code></pre></div>${step === 4 ? '<div class="demo-call">La oss prøve. ↗</div>' : ""}`;
 }
 
 const slides: Slide[] = [
@@ -626,7 +627,7 @@ const slides: Slide[] = [
       "Caffeine: Pod A henter og fyller sin lokale cache.",
       "Caffeine: Pod B må bygge sin egen kopi.",
       "Caffeine: omstart tømmer den lokale cachen.",
-      "Redis: én delt cache utenfor applikasjonspoddene.",
+      "Redis: én delt cache i OpenShift, utenfor applikasjonspoddene.",
       "Redis: poddene gjenbruker samme domstolliste.",
       "Redis: Pod A starter på nytt. Den delte verdien er der fortsatt.",
       "Redis: også lasting kan samordnes på tvers av podder.",
@@ -683,10 +684,11 @@ const slides: Slide[] = [
     labels: [
       "Du henter data. Fellesløsningen håndterer cachen.",
       "En cache-nøkkel som identifiserer resultatet.",
+      "Et oppslag etter fem minutter kan starte en bakgrunnsoppdatering.",
       "Din vanlige hentefunksjon.",
       "La oss gå til live-demoen.",
     ],
-    note: "Eksempelet forutsetter en opprettet caching-instans. Nøkkelen må inkludere alle parametere som påvirker resultatet. operationName er fast, ikke en bruker-ID. Dette eksempelet gjelder applikasjonsdelte data; brukeravhengige resultater trenger isolatedFor og fortsatt autorisasjon. Gå videre til oppsett og kjøring i live-demoen.",
+    note: "Eksempelet forutsetter en opprettet caching-instans og import av kotlin.time.Duration.Companion.minutes. Nøkkelen må inkludere alle parametere som påvirker resultatet. operationName er fast, ikke en bruker-ID. Med refreshAfter = 5.minutes kan et oppslag etter fem minutter starte en bakgrunnsoppdatering; det er ikke en utløpsgrense eller en timer. Dette eksempelet gjelder applikasjonsdelte data; brukeravhengige resultater trenger isolatedFor og fortsatt autorisasjon. Gå videre til oppsett og kjøring i live-demoen.",
     draw: codeScene,
   },
 ];
