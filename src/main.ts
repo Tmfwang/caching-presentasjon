@@ -257,8 +257,6 @@ function fingerprint(step: number): string {
     body +=
       packet(payloadPath, "green", 0.5, 1.5, true) +
       text(720, 445, "Hent ny dokumentliste", "small green-text");
-  if (step === 5)
-    body += `<g class="reveal">${wire("M510 405H930", "purple")}<path d="M720 390v30" stroke="#b49aff" stroke-width="3"/>${text(720, 455, "Valgfri grense: vent på kontroll", "small purple-text")}</g>`;
   return svg(
     body,
     "Et lite fingeravtrykk sammenlignes. Uendret betyr at payloaden beholdes og gyldigheten fornyes. Endret betyr ny lasting.",
@@ -599,9 +597,8 @@ const slides: Slide[] = [
       "Samme fingeravtrykk.",
       "Ingen ny payload. Gyldigheten starter på nytt.",
       "Endret fingeravtrykk? Hent ny dokumentliste.",
-      "Du kan også kreve kontroll før neste svar.",
     ],
-    note: "Fingeravtrykk er valgfritt og leveres av konsumenten. Her bruker vi sist oppdatert-tidspunkt: 10:32 er uendret, mens 10:47 betyr at dokumentlisten er endret. Datoen er utelatt kun for å forenkle illustrasjonen; i reell bruk må hele tidspunktet og tilstrekkelig presisjon inngå. Uendret kontroll fornyer gyldigheten; endring gir ny payload. Alle endringer som påvirker resultatet må endre fingeravtrykket. Siste steg viser den valgfrie grensen der kontroll må avventes. Størrelsen på pakkene er en metafor.",
+    note: "Fingeravtrykk er valgfritt og leveres av konsumenten. Her bruker vi sist oppdatert-tidspunkt: 10:32 er uendret, mens 10:47 betyr at dokumentlisten er endret. Datoen er utelatt kun for å forenkle illustrasjonen; i reell bruk må hele tidspunktet og tilstrekkelig presisjon inngå. Uendret kontroll fornyer gyldigheten; endring gir ny payload. Alle endringer som påvirker resultatet må endre fingeravtrykket. Størrelsen på pakkene er en metafor.",
     draw: fingerprint,
   },
   {
