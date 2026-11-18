@@ -279,7 +279,7 @@ function singleFlight(step: number): string {
     step >= 3 ? "" : "cache",
     "Cache",
     "green",
-    step >= 3 ? "Domstollisten er lagret" : "Domstolliste · tom cache",
+    step >= 3 ? "Domstolliste i cachen" : "Domstolliste · tom cache",
   );
   body +=
     node(1180, 250, "source", "Datakilde", "purple") +
@@ -450,16 +450,20 @@ function architecture(step: number): string {
 }
 
 function protection(step: number): string {
-  let body = node(720, 180, "shield", "Automatisk beskyttelse", "green");
-  body += `<rect x="120" y="130" width="300" height="95" rx="15" class="panel cyan"/>${text(270, 185, "dokumentliste:123", "label cyan-text")}`;
+  let body = `<rect x="120" y="130" width="300" height="95" rx="15" class="panel cyan"/>${text(270, 185, "dokumentliste:123", "label cyan-text")}`;
   body += wire("M430 180H630", "active") + wire("M810 180H1030", "return");
-  body += `<rect x="1040" y="130" width="280" height="95" rx="15" class="panel ${step >= 1 ? "green" : ""}"/>${text(1180, 185, step >= 1 ? "9f3a…72bc" : "Lagringsnøkkel", step >= 1 ? "label green-text" : "small")}`;
+  body += `<rect x="1040" y="130" width="280" height="95" rx="15" class="panel ${step >= 1 ? "green" : ""}"/>${text(1180, 185, step >= 1 ? "9f3a…72bc" : "Cache-nøkkel", step >= 1 ? "label green-text" : "small")}`;
   if (step >= 1)
     body +=
       packet("M430 180H1030", "cyan", 0, 1) +
       text(1180, 270, "Nøkler hashes", "small green-text");
+  body += node(720, 180, "shield", "Automatisk beskyttelse", "green");
   body +=
-    doc(270, 370, "v1", 0.7) + wire("M320 370H1030", step >= 2 ? "purple" : "");
+    doc(270, 370, "v1", 0.7) +
+    wire(
+      step >= 2 ? "M320 370H630 M810 370H1030" : "M320 370H1030",
+      step >= 2 ? "purple" : "",
+    );
   body += node(
     1180,
     370,
@@ -470,11 +474,10 @@ function protection(step: number): string {
   if (step >= 2)
     body +=
       packet("M320 370H1030", "purple", 0, 1.2, true) +
-      icon(720, 370, "lock", "#b49aff") +
-      text(720, 450, "Redis-verdier krypteres", "small purple-text");
+      node(720, 370, "lock", "Redis-verdier krypteres", "purple");
   return svg(
     body,
-    "Lesbare nøkler hashes til ugjenkjennelige lagringsnøkler. Redis-verdier krypteres automatisk.",
+    "Lesbare nøkler hashes før de brukes som cache-nøkler. Redis-verdier krypteres automatisk.",
   );
 }
 
@@ -503,7 +506,7 @@ function telemetry(step: number): string {
 }
 
 function codeScene(step: number): string {
-  return `<div class="code-card" data-no-advance><div class="code-top"><i></i><i></i><i></i><span>Kotlin · i din tjeneste</span></div><pre><code><span class="code-line"><span class="kw">val</span> dokumentliste: List&lt;Dokument&gt; = caching.<span class="fn">getOrRefresh</span>(</span><span class="code-line ${step === 1 ? "highlight" : ""}">    key = <span class="str">"dokumentliste:$sakId"</span>,</span><span class="code-line">    operationName = <span class="str">"hentDokumentliste"</span>,</span><span class="code-line ${step === 2 ? "highlight" : ""}">    loader = { dokumentAccess.<span class="fn">hentDokumentliste</span>(sakId) },</span><span class="code-line">)</span></code></pre></div>${step === 3 ? '<div class="demo-call">La oss prøve. ↗</div>' : ""}`;
+  return `<div class="code-card" data-no-advance><div class="code-top"><i></i><i></i><i></i><span>Kotlin · i din tjeneste</span></div><pre><code><span class="code-line"><span class="kw">val</span> dokumentliste: List&lt;Dokument&gt; = caching.<span class="fn">getOrRefresh</span>(</span><span class="code-line ${step === 1 ? "highlight" : ""}">    key = <span class="str">"dokumentliste:$sakId"</span>,</span><span class="code-line">    operationName = <span class="str">"hentDokumentliste"</span>,</span><span class="code-line">) {</span><span class="code-line ${step === 2 ? "highlight" : ""}">    dokumentAccess.<span class="fn">hentDokumentliste</span>(sakId)</span><span class="code-line">}</span></code></pre></div>${step === 3 ? '<div class="demo-call">La oss prøve. ↗</div>' : ""}`;
 }
 
 const slides: Slide[] = [
@@ -605,7 +608,7 @@ const slides: Slide[] = [
       "Samme domstolliste. Samtidige oppslag. Tom cache.",
       "Alle trenger listen over domstoler.",
       "Én laster. De andre venter.",
-      "Resultatet lagres én gang.",
+      "Resultatet lagres én gang i cachen.",
       "Alle gjenbruker resultatet.",
     ],
     note: "Eksempelet her er listen over domstoler, som deles av alle kallere. Vi viser en cachebom, slik at de andre faktisk må vente. Single-flight samordner per nøkkel. Ved brukbar lagret verdi kan andre få den mens oppdatering pågår. Redis samordner også mellom podder; lokal cache gjør ikke det mellom uavhengige podder.",
@@ -618,10 +621,10 @@ const slides: Slide[] = [
     duration: 65,
     labels: [
       "Caffeine: hver pod har sin egen domstolliste.",
-      "Caffeine: Pod A henter og lagrer lokalt.",
+      "Caffeine: Pod A henter og fyller sin lokale cache.",
       "Caffeine: Pod B må bygge sin egen kopi.",
       "Caffeine: omstart tømmer den lokale cachen.",
-      "Redis: ett delt lager utenfor applikasjonspoddene.",
+      "Redis: én delt cache utenfor applikasjonspoddene.",
       "Redis: poddene gjenbruker samme domstolliste.",
       "Redis: Pod A starter på nytt. Den delte verdien er der fortsatt.",
       "Redis: også lasting kan samordnes på tvers av podder.",
@@ -644,12 +647,12 @@ const slides: Slide[] = [
     draw: architecture,
   },
   {
-    title: "Sikkerhet følger med.",
-    accent: "følger med.",
+    title: "Sikkerhet integrert i løsningen",
+    accent: "integrert i løsningen",
     chapter: "04 / FERDIG HÅNDTERT",
     duration: 25,
     labels: [
-      "Fellesløsningen tar hånd om lagringsbeskyttelsen.",
+      "Fellesløsningen beskytter dataene i cachen.",
       "Nøkler hashes automatisk.",
       "Redis-verdier krypteres automatisk.",
     ],
@@ -677,7 +680,7 @@ const slides: Slide[] = [
     duration: 35,
     labels: [
       "Du henter data. Fellesløsningen håndterer cachen.",
-      "En nøkkel som identifiserer resultatet.",
+      "En cache-nøkkel som identifiserer resultatet.",
       "Din vanlige hentefunksjon.",
       "La oss gå til live-demoen.",
     ],
