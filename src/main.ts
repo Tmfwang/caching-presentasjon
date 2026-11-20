@@ -792,6 +792,7 @@ function render(): void {
     `Slide ${current + 1}: ${slide.title} ${slide.labels[step]}`;
   document.title = `${current + 1}. ${slide.title} — Felles caching`;
   history.replaceState(null, "", `#${current + 1}/${step}`);
+  if (dialog.open && dialogMode === "notes") renderNotes();
 }
 function move(direction: number): void {
   if (direction > 0) {
@@ -835,19 +836,29 @@ async function fullscreen(): Promise<void> {
       "Fullskjerm er ikke tilgjengelig i denne nettleseren.";
   }
 }
-function openDialog(mode: "notes" | "overview"): void {
-  dialogMode = mode;
+function renderNotes(): void {
   const slide = slides[current];
-  element("dialog-title").textContent =
-    mode === "notes" ? `${current + 1}. ${slide.title}` : "Velg en slide";
+  element("dialog-title").textContent = `${current + 1}. ${slide.title}`;
+  element("dialog-body").innerHTML =
+    `<p class="note-step">${slide.cover ? "" : `Steg ${step + 1}/${slide.labels.length} · `}${slide.duration} sekunder</p><p>${slide.note}</p>${slide.cover ? "" : `<ol>${slide.labels.map((label, i) => `<li${i === step ? ' class="note-step" aria-current="step"' : ""}>${label}</li>`).join("")}</ol>`}`;
+}
+function toggleDialog(mode: "notes" | "overview"): void {
+  if (dialog.open) {
+    dialog.close();
+    if (dialogMode === mode) return;
+  }
+  dialogMode = mode;
+  dialog.dataset.mode = mode;
   if (mode === "notes") {
-    element("dialog-body").innerHTML =
-      `<p class="note-step">${slide.cover ? "" : `Steg ${step + 1}/${slide.labels.length} · `}${slide.duration} sekunder</p><p>${slide.note}</p>${slide.cover ? "" : `<ol>${slide.labels.map((label, i) => `<li${i === step ? ' class="note-step"' : ""}>${label}</li>`).join("")}</ol>`}<p>Notatene vises på denne skjermen. Lukk før du fortsetter presentasjonen.</p>`;
+    renderNotes();
+    dialog.show();
+    element("dialog-title").focus({ preventScroll: true });
   } else {
+    element("dialog-title").textContent = "Velg en slide";
     element("dialog-body").innerHTML =
       `<div class="overview-grid">${slides.map((s, i) => `<button data-slide="${i}" ${current === i ? 'aria-current="true"' : ""}>${String(i + 1).padStart(2, "0")} · ${s.title}</button>`).join("")}</div>`;
+    dialog.showModal();
   }
-  if (!dialog.open) dialog.showModal();
 }
 
 element("next").addEventListener("click", () => move(1));
@@ -857,10 +868,11 @@ element("restart").addEventListener("click", () => {
   render();
 });
 element("fullscreen").addEventListener("click", () => void fullscreen());
-element("notes").addEventListener("click", () => openDialog("notes"));
-element("overview").addEventListener("click", () => openDialog("overview"));
+element("notes").addEventListener("click", () => toggleDialog("notes"));
+element("overview").addEventListener("click", () => toggleDialog("overview"));
 element("close-dialog").addEventListener("click", () => dialog.close());
 dialog.addEventListener("close", () => {
+  if (dialog.open) return;
   element(dialogMode === "notes" ? "notes" : "overview").focus({
     preventScroll: true,
   });
@@ -882,9 +894,13 @@ element("slide").addEventListener("click", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
-  if (dialog.open) {
-    if (event.key.toLowerCase() === (dialogMode === "notes" ? "n" : "o"))
-      dialog.close();
+  if (dialog.open && dialogMode === "overview") {
+    if (event.key.toLowerCase() === "o") dialog.close();
+    return;
+  }
+  if (dialog.open && event.key === "Escape") {
+    event.preventDefault();
+    dialog.close();
     return;
   }
   if (
@@ -912,8 +928,8 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key.toLowerCase() === "r") {
     step = 0;
     render();
-  } else if (event.key.toLowerCase() === "n") openDialog("notes");
-  else if (event.key.toLowerCase() === "o") openDialog("overview");
+  } else if (event.key.toLowerCase() === "n") toggleDialog("notes");
+  else if (event.key.toLowerCase() === "o") toggleDialog("overview");
   else if (event.key.toLowerCase() === "f") void fullscreen();
 });
 window.addEventListener("resize", resize);

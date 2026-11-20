@@ -52,7 +52,7 @@ Kontrollene nederst kan også brukes med mus eller tastatur. Klikk på kodekorte
 
 Direktelenker bruker formatet `#slide/steg`, med forsiden på `#1/0` og første fagslide på `#2/0`. Eksempel: **http://localhost:4173/#9/4** åpner Redis-delen av OpenShift-sliden. Posisjonen beholdes ved oppfriskning.
 
-Presentatørnotatene beskriver poeng, steg, anbefalt tid og faglige presiseringer for hver slide. **Notatdialogen åpnes på samme skjerm**, så bruk den ved innøving og lukk den før videre presentasjon.
+Presentatørnotatene beskriver poeng, steg, anbefalt tid og faglige presiseringer for hver slide. De vises på samme skjerm og oppdateres når du navigerer med tastaturet, pilknappene eller ved å klikke på scenen. Trykk `N` eller `Escape` for å lukke dem.
 
 ## Innøving
 
