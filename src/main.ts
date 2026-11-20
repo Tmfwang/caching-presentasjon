@@ -792,7 +792,10 @@ function render(): void {
     `Slide ${current + 1}: ${slide.title} ${slide.labels[step]}`;
   document.title = `${current + 1}. ${slide.title} — Felles caching`;
   history.replaceState(null, "", `#${current + 1}/${step}`);
-  if (dialog.open && dialogMode === "notes") renderNotes();
+  if (dialog.open && dialogMode === "notes") {
+    renderNotes();
+    revealNoteStep();
+  }
 }
 function move(direction: number): void {
   if (direction > 0) {
@@ -842,6 +845,18 @@ function renderNotes(): void {
   element("dialog-body").innerHTML =
     `<p class="note-step">${slide.cover ? "" : `Steg ${step + 1}/${slide.labels.length} · `}${slide.duration} sekunder</p><p>${slide.note}</p>${slide.cover ? "" : `<ol>${slide.labels.map((label, i) => `<li${i === step ? ' class="note-step" aria-current="step"' : ""}>${label}</li>`).join("")}</ol>`}`;
 }
+function revealNoteStep(): void {
+  const body = element("dialog-body");
+  const active = body.querySelector("li[aria-current='step']");
+  if (!active) return;
+
+  const top = body.getBoundingClientRect().top;
+  const bottom = top + body.clientHeight;
+  const bounds = active.getBoundingClientRect();
+  if (bounds.top < top) body.scrollTop += Math.floor(bounds.top - top);
+  else if (bounds.bottom > bottom)
+    body.scrollTop += Math.ceil(bounds.bottom - bottom);
+}
 function toggleDialog(mode: "notes" | "overview"): void {
   if (dialog.open) {
     dialog.close();
@@ -853,6 +868,7 @@ function toggleDialog(mode: "notes" | "overview"): void {
     renderNotes();
     dialog.show();
     element("dialog-title").focus({ preventScroll: true });
+    revealNoteStep();
   } else {
     element("dialog-title").textContent = "Velg en slide";
     element("dialog-body").innerHTML =
