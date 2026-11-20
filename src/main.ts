@@ -1,11 +1,12 @@
 type Slide = {
   title: string;
-  accent: string;
+  accent?: string;
   chapter: string;
   duration: number;
   labels: string[];
   note: string;
   draw: (step: number) => string;
+  cover?: true;
 };
 
 const flowSlowDown = 2.2;
@@ -515,6 +516,15 @@ function codeScene(step: number): string {
 
 const slides: Slide[] = [
   {
+    title: "Ny felles cacheløsning",
+    chapter: "",
+    duration: 15,
+    labels: [""],
+    note: "Åpne med gevinsten: Hva om tjenesten kunne svare uten å hente den samme dokumentlisten på nytt hver gang? Gå videre til eksempelet.",
+    draw: () => "",
+    cover: true,
+  },
+  {
     title: "Hvorfor hente det samme om igjen?",
     accent: "samme",
     chapter: "01 / HVORFOR CACHE",
@@ -753,10 +763,10 @@ function startFlowLoops(): void {
 
 function render(): void {
   const slide = slides[current];
-  element("title").innerHTML = slide.title.replace(
-    slide.accent,
-    `<em>${slide.accent}</em>`,
-  );
+  element("slide").classList.toggle("cover", slide.cover === true);
+  element("title").innerHTML = slide.accent
+    ? slide.title.replace(slide.accent, `<em>${slide.accent}</em>`)
+    : slide.title;
   element("chapter").textContent = slide.chapter;
   scene.innerHTML = slide.draw(step);
   startFlowLoops();
@@ -772,7 +782,7 @@ function render(): void {
     `Steg ${step + 1} av ${slide.labels.length}`,
   );
   element("counter").textContent =
-    `${String(current + 1).padStart(2, "0")} / 12`;
+    `${String(current + 1).padStart(2, "0")} / ${slides.length}`;
   element("progress").style.width =
     `${((current + (step + 1) / slide.labels.length) / slides.length) * 100}%`;
   element<HTMLButtonElement>("previous").disabled = current === 0 && step === 0;
@@ -832,7 +842,7 @@ function openDialog(mode: "notes" | "overview"): void {
     mode === "notes" ? `${current + 1}. ${slide.title}` : "Velg en slide";
   if (mode === "notes") {
     element("dialog-body").innerHTML =
-      `<p class="note-step">Steg ${step + 1}/${slide.labels.length} · ${slide.duration} sekunder</p><p>${slide.note}</p><ol>${slide.labels.map((label, i) => `<li${i === step ? ' class="note-step"' : ""}>${label}</li>`).join("")}</ol><p>Notatene vises på denne skjermen. Lukk før du fortsetter presentasjonen.</p>`;
+      `<p class="note-step">${slide.cover ? "" : `Steg ${step + 1}/${slide.labels.length} · `}${slide.duration} sekunder</p><p>${slide.note}</p>${slide.cover ? "" : `<ol>${slide.labels.map((label, i) => `<li${i === step ? ' class="note-step"' : ""}>${label}</li>`).join("")}</ol>`}<p>Notatene vises på denne skjermen. Lukk før du fortsetter presentasjonen.</p>`;
   } else {
     element("dialog-body").innerHTML =
       `<div class="overview-grid">${slides.map((s, i) => `<button data-slide="${i}" ${current === i ? 'aria-current="true"' : ""}>${String(i + 1).padStart(2, "0")} · ${s.title}</button>`).join("")}</div>`;

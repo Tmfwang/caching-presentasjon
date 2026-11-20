@@ -1,6 +1,6 @@
-# Mindre venting. Mer flyt.
+# Ny felles cacheløsning
 
-En selvstendig, animert presentasjon av felles cacheløsning. Tolv slides, omtrent ti minutter, med et kort kodeeksempel som overgang til live-demo.
+En selvstendig, animert presentasjon av felles cacheløsning. Forside og tolv fagslides, omtrent ti minutter, med et kort kodeeksempel som overgang til live-demo.
 
 ## Start presentasjonen
 
@@ -40,7 +40,7 @@ Publiserte CSS- og JavaScript-filer får en innholdshash i filnavnet, slik at ne
 | ------------------------------------------------ | ----------------------------------------------- |
 | Neste animasjonssteg, deretter neste slide       | `→`, `Space`, `Page Down` eller klikk på scenen |
 | Forrige steg, deretter forrige slides siste steg | `←` eller `Page Up`                             |
-| Første slide                                     | `Home`                                          |
+| Forsiden                                         | `Home`                                          |
 | Siste slide, med kode synlig                     | `End`                                           |
 | Start gjeldende slide på nytt                    | `R` eller ↻                                     |
 | Slideoversikt                                    | `O` eller ▦                                     |
@@ -50,7 +50,7 @@ Publiserte CSS- og JavaScript-filer får en innholdshash i filnavnet, slik at ne
 
 Kontrollene nederst kan også brukes med mus eller tastatur. Klikk på kodekortet går ikke videre, slik at koden kan markeres.
 
-Direktelenker bruker formatet `#slide/steg`, med slides fra 1 og steg fra 0. Eksempel: **http://localhost:4173/#8/4** åpner Redis-delen av OpenShift-sliden. Posisjonen beholdes ved oppfriskning.
+Direktelenker bruker formatet `#slide/steg`, med forsiden på `#1/0` og første fagslide på `#2/0`. Eksempel: **http://localhost:4173/#9/4** åpner Redis-delen av OpenShift-sliden. Posisjonen beholdes ved oppfriskning.
 
 Presentatørnotatene beskriver poeng, steg, anbefalt tid og faglige presiseringer for hver slide. **Notatdialogen åpnes på samme skjerm**, så bruk den ved innøving og lukk den før videre presentasjon.
 

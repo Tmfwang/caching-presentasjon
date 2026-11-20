@@ -52,7 +52,9 @@ Krav til formidlingen:
 
 ## 4. Slideplan
 
-Tidene er veiledende og summerer til 10 minutter. Presentatøren styrer fremdriften; ingen automatisk overgang mellom slides.
+Presentasjonen starter på forsiden «Ny felles cacheløsning» uten animasjonssteg. Nummereringen nedenfor gjelder fagslidene: fagslide 1 er slide 2 i selve presentasjonen.
+
+Tidene er veiledende. Presentatøren styrer fremdriften; ingen automatisk overgang mellom slides.
 
 | Nr. | Tittel                            | Tid    |
 | --- | --------------------------------- | ------ |
@@ -369,7 +371,7 @@ Følgende presiseringer skal ivaretas i illustrasjoner og notater:
 
 ## 10. Akseptansekriterier for implementeringen
 
-1. Alle 12 slides er implementert i angitt rekkefølge med de beskrevne hovedpoengene.
+1. Forsiden vises først, etterfulgt av alle 12 fagslides i angitt rekkefølge med de beskrevne hovedpoengene.
 2. Presentasjonen kan gjennomføres på omtrent 10 minutter uten at animasjonene tvinger frem lange ventepauser.
 3. Slide 1–11 inneholder ingen kode. Slide 12 viser ett kort, API-riktig `getOrRefresh`-eksempel.
 4. Cachebom, cachetreff, bakgrunnsoppdatering, uendret/endret fingeravtrykk og single-flight kan forstås gjennom figurene og bevegelsen.

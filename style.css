@@ -112,6 +112,29 @@ h1 em {
   display: flex;
   gap: 7px;
 }
+.cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 700px;
+  padding: 0 92px;
+  position: relative;
+}
+#deck:has(.cover) .masthead {
+  visibility: hidden;
+}
+.cover .heading {
+  padding: 0;
+}
+.cover h1 {
+  font-size: 88px;
+  text-align: center;
+}
+.cover #scene,
+.cover .caption {
+  display: none;
+}
 .step-dot {
   width: 22px;
   height: 4px;
